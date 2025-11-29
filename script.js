@@ -11,6 +11,7 @@ function setup(card) {
   episode.querySelector("#name").textContent = name;
   episode.querySelector("#episode-code").textContent = episodeCode;
   episode.querySelector("#image").src = mediumSizedImage;
+  episode.querySelector("#image").alt=`Image for ${episodeCode}`
   episode.querySelector("#summary").innerHTML = summary;
   document.querySelector("#root").appendChild(episode);
 }

@@ -1,3 +1,27 @@
+body{
+  background-color: rgb(78, 76, 76);
+}
+
 #root {
   color: rgb(4, 4, 4);
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+#each-episode {
+  background-color: #ffffff;
+  border:ridge;
+  padding: clamp(1rem, 2vw, 2rem);
+  border-radius: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+#episode-code {
+  font-size: 1.5 rem;
+  font-weight: bold;
 }

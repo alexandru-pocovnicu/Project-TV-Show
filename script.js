@@ -23,20 +23,42 @@ const state = {
   searchTerm: "",
 };
 
-//Turns current state into UI
 function render() {
   const rootElem = document.querySelector("#root");
-
-  //clear old episode cards before drawing new ones
   rootElem.textContent = "";
+  const counterElem = document.querySelector("#counter");
 
-  // for each episode in our state, create and append a card
-  const cards = state.episodes.map(setup);
+  // Filter episodes based on state.searchTerm
+  const filtered = state.episodes.filter((ep) => {
+    const name = ep.name.toLowerCase();
+    const summary = ep.summary.toLowerCase();
+    return (
+      name.includes(state.searchTerm) || summary.includes(state.searchTerm)
+    );
+  });
+
+  // Update counter
+  if (counterElem) {
+    counterElem.textContent = `Displaying ${filtered.length} episode(s)`;
+  }
+
+  // Create cards only from filtered episodes
+  const cards = filtered.map(setup);
   rootElem.append(...cards);
 }
 
 // First render when the page loads
 render();
+
+// Get search input and listen to input event
+const searchInput = document.getElementById("search");
+
+searchInput.addEventListener("input", handleSearchInput);
+
+function handleSearchInput(event) {
+  state.searchTerm = event.target.value.toLowerCase();
+  render();
+}
 
 //create footer and append to the body
 const footer = document.createElement("footer");

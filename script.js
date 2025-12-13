@@ -65,3 +65,6 @@ const footer = document.createElement("footer");
 footer.innerHTML =
   'Data originally from:<a href="https://www.tvmaze.com/">TVMaze.com</a>';
 document.body.append(footer);
+
+//TEST - delete later
+console.log("Total episodes:", state.episodes.length);

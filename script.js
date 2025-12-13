@@ -11,13 +11,30 @@ function setup(card) {
   episode.querySelector("#name").textContent = name;
   episode.querySelector("#episode-code").textContent = episodeCode;
   episode.querySelector("#image").src = mediumSizedImage;
-  episode.querySelector("#image").alt=`Image for ${episodeCode}`
+  episode.querySelector("#image").alt = `Image for ${episodeCode}`;
   episode.querySelector("#summary").innerHTML = summary;
   document.querySelector("#root").appendChild(episode);
 }
 
-const allEpisodes = getAllEpisodes();
-allEpisodes.map(setup);
+// State
+const state = {
+  episodes: getAllEpisodes(),
+  searchTerm: "",
+};
+
+//Turns current state into UI
+function render() {
+  const rootElem = document.querySelector("#root");
+
+  //clear old episode cards before drawing new ones
+  rootElem.textContent = "";
+
+  // for each episode in our state, create and append a card
+  state.episodes.forEach(setup);
+}
+
+// First render when the page loads
+render();
 
 //create footer and append to the body
 const footer = document.createElement("footer");

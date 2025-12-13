@@ -13,7 +13,8 @@ function setup(card) {
   episode.querySelector("#image").src = mediumSizedImage;
   episode.querySelector("#image").alt = `Image for ${episodeCode}`;
   episode.querySelector("#summary").innerHTML = summary;
-  document.querySelector("#root").appendChild(episode);
+
+  return episode;
 }
 
 // State
@@ -30,7 +31,8 @@ function render() {
   rootElem.textContent = "";
 
   // for each episode in our state, create and append a card
-  state.episodes.forEach(setup);
+  const cards = state.episodes.map(setup);
+  rootElem.append(...cards);
 }
 
 // First render when the page loads

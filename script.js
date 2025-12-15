@@ -23,6 +23,36 @@ const state = {
   searchTerm: "",
 };
 
+function formatEpisodeCode(ep) {
+  const paddedSeason = String(ep.season).padStart(2, "0");
+  const paddedNumber = String(ep.number).padStart(2, "0");
+  return `S${paddedSeason}E${paddedNumber}`;
+}
+
+function populateEpisodeSelect() {
+  const select = document.getElementById("episode-select");
+
+  // Clear existing options
+  select.textContent = "";
+
+  // First option = reset
+  const allOption = document.createElement("option");
+  allOption.value = "";
+  allOption.textContent = "All episodes";
+  select.appendChild(allOption);
+
+  // Add one option per episode
+  state.episodes.forEach((ep) => {
+    const option = document.createElement("option");
+    const code = formatEpisodeCode(ep);
+
+    option.value = ep.id;
+    option.textContent = `${code} - ${ep.name}`;
+
+    select.appendChild(option);
+  });
+}
+
 function render() {
   const rootElem = document.querySelector("#root");
   rootElem.textContent = "";
@@ -49,6 +79,9 @@ function render() {
 
 // First render when the page loads
 render();
+
+// Populate episode select dropdown
+populateEpisodeSelect();
 
 // Get search input and listen to input event
 const searchInput = document.getElementById("search");

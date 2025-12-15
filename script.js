@@ -26,12 +26,14 @@ const state = {
   episodes: [],
   searchTerm: "",
   selectedEpisodeId: "",
+  loading:true,
 };
 
 fetch("https://api.tvmaze.com/shows/82/episodes")
   .then((response) => response.json())
   .then((data) => {
     state.episodes = data;
+    state.loading=false
     render();
     populateEpisodeSelect();
   });
@@ -71,8 +73,18 @@ function render() {
   const counterElem = document.querySelector("#counter");
   rootElem.textContent = "";
 
+  if (state.loading) {
+    rootElem.textContent = "Loading episodes...";
+    if (counterElem) counterElem.textContent = "";
+    return;
+  }
+
   // Start from all episodes
   let visibleEpisodes = state.episodes;
+
+
+ 
+
 
   // If an episode is selected, show ONLY that one
   if (state.selectedEpisodeId !== "") {
@@ -89,6 +101,13 @@ function render() {
         name.includes(state.searchTerm) || summary.includes(state.searchTerm)
       );
     });
+  }
+
+
+  if (visibleEpisodes.length === 0) {
+    rootElem.textContent = "No episodes found";
+    if (counterElem) counterElem.textContent = "";
+    return;
   }
 
   // Update counter

@@ -25,6 +25,7 @@ function setup(card) {
 const state = {
   episodes: getAllEpisodes(),
   searchTerm: "",
+  selectedEpisodeId: "",
 };
 
 function formatEpisodeCode(ep) {
@@ -59,25 +60,36 @@ function populateEpisodeSelect() {
 
 function render() {
   const rootElem = document.querySelector("#root");
-  rootElem.textContent = "";
   const counterElem = document.querySelector("#counter");
+  rootElem.textContent = "";
 
-  // Filter episodes based on state.searchTerm
-  const filtered = state.episodes.filter((ep) => {
-    const name = ep.name.toLowerCase();
-    const summary = ep.summary.toLowerCase();
-    return (
-      name.includes(state.searchTerm) || summary.includes(state.searchTerm)
-    );
-  });
+  // Start from all episodes
+  let visibleEpisodes = state.episodes;
+
+  // If an episode is selected, show ONLY that one
+  if (state.selectedEpisodeId !== "") {
+    visibleEpisodes = visibleEpisodes.filter((ep) => {
+      const code = formatEpisodeCode(ep);
+      return `episode-${code}` === state.selectedEpisodeId;
+    });
+  } else {
+    // Otherwise apply search filter (name OR summary)
+    visibleEpisodes = visibleEpisodes.filter((ep) => {
+      const name = ep.name.toLowerCase();
+      const summary = ep.summary.toLowerCase();
+      return (
+        name.includes(state.searchTerm) || summary.includes(state.searchTerm)
+      );
+    });
+  }
 
   // Update counter
   if (counterElem) {
-    counterElem.textContent = `Displaying ${filtered.length} episode(s)`;
+    counterElem.textContent = `Displaying ${visibleEpisodes.length} episode(s)`;
   }
 
-  // Create cards only from filtered episodes
-  const cards = filtered.map(setup);
+  // Render cards
+  const cards = visibleEpisodes.map(setup);
   rootElem.append(...cards);
 }
 
@@ -94,24 +106,36 @@ searchInput.addEventListener("input", handleSearchInput);
 const episodeSelect = document.getElementById("episode-select");
 episodeSelect.addEventListener("change", handleEpisodeSelect);
 
-function handleEpisodeSelect(event) {
-  const selectedId = event.target.value;
+const showAllBtn = document.getElementById("show-all");
+showAllBtn.addEventListener("click", handleShowAll);
 
-  // If user chose "All episodes", do nothing
-  if (selectedId === "") return;
-
+function handleShowAll() {
+  state.selectedEpisodeId = "";
   state.searchTerm = "";
-  searchInput.value = "";
+  episodeSelect.value = ""; // reset dropdown visually
+  searchInput.value = ""; // reset search box visually
   render();
+}
 
-  const target = document.getElementById(selectedId);
-  if (target) {
-    target.scrollIntoView({ behavior: "smooth" });
+function handleEpisodeSelect(event) {
+  state.selectedEpisodeId = event.target.value;
+
+  // Clear search when selecting one episode
+  if (state.selectedEpisodeId !== "") {
+    state.searchTerm = "";
+    searchInput.value = "";
   }
+
+  render();
 }
 
 function handleSearchInput(event) {
   state.searchTerm = event.target.value.toLowerCase();
+
+  // If user starts searching, switch back to "all episodes" mode
+  state.selectedEpisodeId = "";
+  episodeSelect.value = "";
+
   render();
 }
 

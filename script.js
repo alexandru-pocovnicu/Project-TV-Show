@@ -27,16 +27,25 @@ const state = {
   searchTerm: "",
   selectedEpisodeId: "",
   loading:true,
+  error:null,
+  
 };
 
 fetch("https://api.tvmaze.com/shows/82/episodes")
-  .then((response) => response.json())
+  .then((response) =>{ 
+    if(!response.ok)throw new Error("Error")
+    return response.json()})
   .then((data) => {
     state.episodes = data;
     state.loading=false
     render();
     populateEpisodeSelect();
-  });
+  })
+  .catch((err)=>{
+    state.loading = false;
+    state.error = "Failed to load episodes. Please try again later.";
+    render();
+  })
 
 function formatEpisodeCode(ep) {
   const paddedSeason = String(ep.season).padStart(2, "0");
@@ -73,6 +82,13 @@ function render() {
   const counterElem = document.querySelector("#counter");
   rootElem.textContent = "";
 
+
+  if (state.error) {
+    rootElem.textContent = state.error;
+    if (counterElem) counterElem.textContent = "";
+    return;
+  }
+
   if (state.loading) {
     rootElem.textContent = "Loading episodes...";
     if (counterElem) counterElem.textContent = "";
@@ -81,9 +97,6 @@ function render() {
 
   // Start from all episodes
   let visibleEpisodes = state.episodes;
-
-
- 
 
 
   // If an episode is selected, show ONLY that one

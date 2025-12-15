@@ -23,10 +23,18 @@ function setup(card) {
 
 // State
 const state = {
-  episodes: getAllEpisodes(),
+  episodes: [],
   searchTerm: "",
   selectedEpisodeId: "",
 };
+
+fetch("https://api.tvmaze.com/shows/82/episodes")
+  .then((response) => response.json())
+  .then((data) => {
+    state.episodes = data;
+    render();
+    populateEpisodeSelect();
+  });
 
 function formatEpisodeCode(ep) {
   const paddedSeason = String(ep.season).padStart(2, "0");

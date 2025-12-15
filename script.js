@@ -8,6 +8,10 @@ function setup(card) {
 
   //cloned the html template, update template content and updates it to the DOM
   const episode = document.getElementById("episode").content.cloneNode(true);
+
+  const section = episode.querySelector("#each-episode");
+  section.id = `episode-${episodeCode}`;
+
   episode.querySelector("#name").textContent = name;
   episode.querySelector("#episode-code").textContent = episodeCode;
   episode.querySelector("#image").src = mediumSizedImage;
@@ -46,7 +50,7 @@ function populateEpisodeSelect() {
     const option = document.createElement("option");
     const code = formatEpisodeCode(ep);
 
-    option.value = ep.id;
+    option.value = `episode-${code}`;
     option.textContent = `${code} - ${ep.name}`;
 
     select.appendChild(option);
@@ -85,8 +89,26 @@ populateEpisodeSelect();
 
 // Get search input and listen to input event
 const searchInput = document.getElementById("search");
-
 searchInput.addEventListener("input", handleSearchInput);
+
+const episodeSelect = document.getElementById("episode-select");
+episodeSelect.addEventListener("change", handleEpisodeSelect);
+
+function handleEpisodeSelect(event) {
+  const selectedId = event.target.value;
+
+  // If user chose "All episodes", do nothing
+  if (selectedId === "") return;
+
+  state.searchTerm = "";
+  searchInput.value = "";
+  render();
+
+  const target = document.getElementById(selectedId);
+  if (target) {
+    target.scrollIntoView({ behavior: "smooth" });
+  }
+}
 
 function handleSearchInput(event) {
   state.searchTerm = event.target.value.toLowerCase();
@@ -98,6 +120,3 @@ const footer = document.createElement("footer");
 footer.innerHTML =
   'Data originally from:<a href="https://www.tvmaze.com/">TVMaze.com</a>';
 document.body.append(footer);
-
-//TEST - delete later
-console.log("Total episodes:", state.episodes.length);

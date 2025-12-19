@@ -21,6 +21,23 @@ function setup(card) {
   return episode;
 }
 
+function loadShows() {
+  fetchJsonOnce(SHOWS_URL)
+    .then((shows) => {
+      state.shows = shows.slice().sort(compareShowNames);
+      populateShowSelect();
+    })
+    .catch(() => {
+      const showSelect = document.getElementById("show-select");
+      showSelect.textContent = "";
+
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "Failed to load shows";
+      showSelect.appendChild(option);
+    });
+}
+
 const fetchCache = {};
 
 function fetchJsonOnce(url) {
@@ -68,6 +85,29 @@ function formatEpisodeCode(ep) {
   const paddedSeason = String(ep.season).padStart(2, "0");
   const paddedNumber = String(ep.number).padStart(2, "0");
   return `S${paddedSeason}E${paddedNumber}`;
+}
+
+const SHOWS_URL = "https://api.tvmaze.com/shows";
+
+function compareShowNames(a, b) {
+  return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+}
+
+function populateShowSelect() {
+  const showSelect = document.getElementById("show-select");
+  showSelect.textContent = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Select a show...";
+  showSelect.appendChild(placeholder);
+
+  state.shows.forEach((show) => {
+    const option = document.createElement("option");
+    option.value = String(show.id);
+    option.textContent = show.name;
+    showSelect.appendChild(option);
+  });
 }
 
 function populateEpisodeSelect() {
@@ -146,6 +186,8 @@ function render() {
   const cards = visibleEpisodes.map(setup);
   rootElem.append(...cards);
 }
+
+loadShows();
 
 // First render when the page loads
 render();

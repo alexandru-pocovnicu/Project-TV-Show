@@ -21,11 +21,28 @@ function setup(card) {
   return episode;
 }
 
+const fetchCache = {};
+
+function fetchJsonOnce(url) {
+  if (fetchCache[url]) return fetchCache[url];
+
+  fetchCache[url] = fetch(url).then((response) => {
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+    return response.json();
+  });
+
+  return fetchCache[url];
+}
+
 // State
 const state = {
+  shows: [],
+  selectedShowId: "",
+
   episodes: [],
   searchTerm: "",
   selectedEpisodeId: "",
+
   loading: true,
   error: null,
 };

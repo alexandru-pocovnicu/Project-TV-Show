@@ -26,6 +26,11 @@ function loadShows() {
     .then((shows) => {
       state.shows = shows.slice().sort(compareShowNames);
       populateShowSelect();
+
+      // ✅ Auto-load the default show episodes
+      const showSelect = document.getElementById("show-select");
+      showSelect.value = state.selectedShowId;
+      loadEpisodes(state.selectedShowId);
     })
     .catch(() => {
       const showSelect = document.getElementById("show-select");
@@ -65,29 +70,6 @@ const state = {
 };
 
 const SHOWS_URL = "https://api.tvmaze.com/shows";
-
-function loadShows() {
-  fetchJsonOnce(SHOWS_URL)
-    .then((shows) => {
-      state.shows = shows.slice().sort(compareShowNames);
-      populateShowSelect();
-      const showSelect = document.getElementById("show-select");
-
-      if (state.selectedShowId) {
-        showSelect.value = state.selectedShowId;
-        loadEpisodes(state.selectedShowId);
-      }
-    })
-    .catch(() => {
-      const showSelect = document.getElementById("show-select");
-      showSelect.textContent = "";
-
-      const option = document.createElement("option");
-      option.value = "";
-      option.textContent = "Failed to load shows";
-      showSelect.appendChild(option);
-    });
-}
 
 function loadEpisodes(showId) {
   const episodesUrl = `https://api.tvmaze.com/shows/${showId}/episodes`;
@@ -140,24 +122,19 @@ function populateShowSelect() {
 
 function populateEpisodeSelect() {
   const select = document.getElementById("episode-select");
-
-  // Clear existing options
   select.textContent = "";
 
-  // First option = reset
   const allOption = document.createElement("option");
   allOption.value = "";
   allOption.textContent = "All episodes";
   select.appendChild(allOption);
 
-  // Add one option per episode
   state.episodes.forEach((ep) => {
     const option = document.createElement("option");
     const code = formatEpisodeCode(ep);
 
     option.value = `episode-${code}`;
     option.textContent = `${code} - ${ep.name}`;
-
     select.appendChild(option);
   });
 }
@@ -214,9 +191,6 @@ function render() {
   const cards = visibleEpisodes.map(setup);
   rootElem.append(...cards);
 }
-
-// First render when the page loads
-render();
 
 loadShows();
 

@@ -64,6 +64,25 @@ const state = {
   error: null,
 };
 
+const SHOWS_URL = "https://api.tvmaze.com/shows";
+
+function loadShows() {
+  fetchJsonOnce(SHOWS_URL)
+    .then((shows) => {
+      state.shows = shows.slice().sort(compareShowNames);
+      populateShowSelect();
+    })
+    .catch(() => {
+      const showSelect = document.getElementById("show-select");
+      showSelect.textContent = "";
+
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "Failed to load shows";
+      showSelect.appendChild(option);
+    });
+}
+
 fetch("https://api.tvmaze.com/shows/82/episodes")
   .then((response) => {
     if (!response.ok) throw new Error("Error");
@@ -86,8 +105,6 @@ function formatEpisodeCode(ep) {
   const paddedNumber = String(ep.number).padStart(2, "0");
   return `S${paddedSeason}E${paddedNumber}`;
 }
-
-const SHOWS_URL = "https://api.tvmaze.com/shows";
 
 function compareShowNames(a, b) {
   return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
@@ -187,10 +204,10 @@ function render() {
   rootElem.append(...cards);
 }
 
-loadShows();
-
 // First render when the page loads
 render();
+
+loadShows();
 
 // Populate episode select dropdown
 populateEpisodeSelect();

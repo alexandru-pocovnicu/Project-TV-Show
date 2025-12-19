@@ -54,7 +54,7 @@ function fetchJsonOnce(url) {
 // State
 const state = {
   shows: [],
-  selectedShowId: "",
+  selectedShowId: "82",
 
   episodes: [],
   searchTerm: "",
@@ -71,6 +71,12 @@ function loadShows() {
     .then((shows) => {
       state.shows = shows.slice().sort(compareShowNames);
       populateShowSelect();
+      const showSelect = document.getElementById("show-select");
+
+      if (state.selectedShowId) {
+        showSelect.value = state.selectedShowId;
+        loadEpisodes(state.selectedShowId);
+      }
     })
     .catch(() => {
       const showSelect = document.getElementById("show-select");
@@ -83,22 +89,27 @@ function loadShows() {
     });
 }
 
-fetch("https://api.tvmaze.com/shows/82/episodes")
-  .then((response) => {
-    if (!response.ok) throw new Error("Error");
-    return response.json();
-  })
-  .then((data) => {
-    state.episodes = data;
-    state.loading = false;
-    render();
-    populateEpisodeSelect();
-  })
-  .catch((err) => {
-    state.loading = false;
-    state.error = "Failed to load episodes. Please try again later.";
-    render();
-  });
+function loadEpisodes(showId) {
+  const episodesUrl = `https://api.tvmaze.com/shows/${showId}/episodes`;
+
+  state.loading = true;
+  state.error = null;
+  render();
+
+  fetchJsonOnce(episodesUrl)
+    .then((episodes) => {
+      state.episodes = episodes;
+      state.loading = false;
+
+      render();
+      populateEpisodeSelect();
+    })
+    .catch(() => {
+      state.loading = false;
+      state.error = "Failed to load episodes. Please try again later.";
+      render();
+    });
+}
 
 function formatEpisodeCode(ep) {
   const paddedSeason = String(ep.season).padStart(2, "0");
@@ -219,6 +230,9 @@ searchInput.addEventListener("input", handleSearchInput);
 const episodeSelect = document.getElementById("episode-select");
 episodeSelect.addEventListener("change", handleEpisodeSelect);
 
+const showSelect = document.getElementById("show-select");
+showSelect.addEventListener("change", handleShowSelect);
+
 const showAllBtn = document.getElementById("show-all");
 showAllBtn.addEventListener("click", handleShowAll);
 
@@ -228,6 +242,20 @@ function handleShowAll() {
   episodeSelect.value = ""; // reset dropdown visually
   searchInput.value = ""; // reset search box visually
   render();
+}
+function handleShowSelect(event) {
+  const newShowId = event.target.value;
+
+  if (newShowId === "") return;
+
+  state.selectedShowId = newShowId;
+
+  state.searchTerm = "";
+  state.selectedEpisodeId = "";
+  searchInput.value = "";
+  episodeSelect.value = "";
+
+  loadEpisodes(newShowId);
 }
 
 function handleEpisodeSelect(event) {

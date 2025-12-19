@@ -1,12 +1,10 @@
 function setup(card) {
-  //extracts the variables name, season, number, summary, image from episodes.js
   const { name, season, number, summary, image } = card;
-  const mediumSizedImage = image.medium;
+  const mediumSizedImage = image?.medium ?? "";
   const paddedSeason = String(season).padStart(2, "0");
   const paddedNumber = String(number).padStart(2, "0");
   const episodeCode = `S${paddedSeason}E${paddedNumber}`;
 
-  //cloned the html template, update template content and updates it to the DOM
   const episode = document.getElementById("episode").content.cloneNode(true);
 
   const section = episode.querySelector("#each-episode");
@@ -14,9 +12,16 @@ function setup(card) {
 
   episode.querySelector("#name").textContent = name;
   episode.querySelector("#episode-code").textContent = episodeCode;
-  episode.querySelector("#image").src = mediumSizedImage;
-  episode.querySelector("#image").alt = `Image for ${episodeCode}`;
-  episode.querySelector("#summary").innerHTML = summary;
+  const img = episode.querySelector("#image");
+  img.alt = `Image for ${episodeCode}`;
+
+  if (mediumSizedImage) {
+    img.src = mediumSizedImage;
+  } else {
+    img.remove();
+  }
+
+  episode.querySelector("#summary").innerHTML = summary ?? "";
 
   return episode;
 }
@@ -27,7 +32,6 @@ function loadShows() {
       state.shows = shows.slice().sort(compareShowNames);
       populateShowSelect();
 
-      // ✅ Auto-load the default show episodes
       const showSelect = document.getElementById("show-select");
       showSelect.value = state.selectedShowId;
       loadEpisodes(state.selectedShowId);
@@ -169,7 +173,7 @@ function render() {
     // Otherwise apply search filter (name OR summary)
     visibleEpisodes = visibleEpisodes.filter((ep) => {
       const name = ep.name.toLowerCase();
-      const summary = ep.summary.toLowerCase();
+      const summary = (ep.summary ?? "").toLowerCase();
       return (
         name.includes(state.searchTerm) || summary.includes(state.searchTerm)
       );
@@ -194,10 +198,6 @@ function render() {
 
 loadShows();
 
-// Populate episode select dropdown
-populateEpisodeSelect();
-
-// Get search input and listen to input event
 const searchInput = document.getElementById("search");
 searchInput.addEventListener("input", handleSearchInput);
 

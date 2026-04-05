@@ -31,7 +31,7 @@ function createEpisodeCard(episode) {
 
   let episodeContainer=document.createElement("div")
   episodeContainer.append(episodeTitle, mediumImage, episodeSummary);
-
+  episodeContainer.classList.add("episode-container")
   return episodeContainer
 }
 

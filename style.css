@@ -1,5 +1,7 @@
 #root {
   color: rgb(14, 14, 14);
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 body{

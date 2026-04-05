@@ -1,3 +1,23 @@
 #root {
   color: rgb(14, 14, 14);
 }
+
+body{
+  margin: 0;
+  padding: clamp(12px, 3vw, 28px);
+}
+
+.episode-container{
+  width: 100%;
+  max-width: 500px;
+  border: double;
+  padding: clamp(10px, 1.5vw, 18px);
+  margin-inline: auto;
+}
+
+img{
+  width: 100%;
+  height: auto;
+  margin: 0;
+
+}

@@ -29,7 +29,7 @@ function createEpisodeCard(episode) {
   mediumImage.src=image.medium;
   mediumImage.alt = `${name}-${episodeCode}`;
 
-  let episodeContainer=document.createElement("container")
+  let episodeContainer=document.createElement("div")
   episodeContainer.append(episodeTitle, mediumImage, episodeSummary);
 
   return episodeContainer

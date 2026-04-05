@@ -7,7 +7,10 @@ function setup() {
 
 function makePageForEpisodes(episodeList) {
   const rootElem = document.getElementById("root");
-  
+  for (let episode of episodeList) {
+    let episodeCard = createEpisodeCard(episode);
+    rootElem.append(episodeCard);
+  }
 }
 
 function createEpisodeCard(episode) {

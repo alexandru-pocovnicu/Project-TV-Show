@@ -1,15 +1,32 @@
 #root {
   color: rgb(14, 14, 14);
-  display:grid;
+  display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
-body{
+body {
   margin: 0;
   padding: clamp(12px, 3vw, 28px);
 }
 
-.episode-container{
+.controls {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+  max-width: 600px;
+}
+
+.controls input,
+.controls select {
+  padding: 10px;
+}
+
+.match-count {
+  margin: 0;
+}
+
+.episode-container {
   width: 100%;
   max-width: 500px;
   border: double;
@@ -17,9 +34,14 @@ body{
   margin-inline: auto;
 }
 
-img{
+img {
   width: 100%;
   height: auto;
   margin: 0;
+}
 
+@media (max-width: 780px) {
+  #root {
+    grid-template-columns: 1fr;
+  }
 }

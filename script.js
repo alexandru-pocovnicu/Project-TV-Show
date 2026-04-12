@@ -17,10 +17,14 @@ async function setup() {
       rootElem.textContent = "Loading episode...";
     }
   }
-  
-  showLoadingMessage()
 
-  const allEpisodes = await fetchFilms();
+  showLoadingMessage()
+  let allEpisodes;
+  try{
+   allEpisodes = await fetchFilms();
+  }catch(error){
+    rootElem.textContent="Show not available, please try again later"
+  }
 
   loading = false;
 

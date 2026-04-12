@@ -8,10 +8,22 @@ async function setup() {
       },
     );
   }
+  const rootElem = document.getElementById("root");
+
+  let loading = true;
+
+  function showLoadingMessage() {
+    if (loading === true) {
+      rootElem.textContent = "Loading episode...";
+    }
+  }
+  
+  showLoadingMessage()
 
   const allEpisodes = await fetchFilms();
 
-  const rootElem = document.getElementById("root");
+  loading = false;
+
   const controls = createControls(allEpisodes);
   const state = {
     searchTerm: "",
@@ -32,6 +44,8 @@ async function setup() {
 
   renderPage(allEpisodes, state, controls.matchCount, rootElem);
 }
+
+
 
 function createControls(allEpisodes) {
   const container = document.createElement("section");

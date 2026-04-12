@@ -1,7 +1,16 @@
 // You can edit ALL of the code here
 
-function setup() {
-  const allEpisodes = getAllEpisodes();
+async function setup() {
+  function fetchFilms() {
+    return fetch("https://api.tvmaze.com/shows/82/episodes").then(
+      function (data) {
+        return data.json();
+      },
+    );
+  }
+
+  const allEpisodes = await fetchFilms();
+
   const rootElem = document.getElementById("root");
   const controls = createControls(allEpisodes);
   const state = {

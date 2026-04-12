@@ -28,18 +28,14 @@ function createControls(allEpisodes) {
   const container = document.createElement("section");
   container.classList.add("controls");
 
-  const searchLabel = document.createElement("label");
-  searchLabel.setAttribute("for", "episode-search");
-  searchLabel.textContent = "Search episodes";
+  const searchLabel = createLabel("episode-search", "Search episodes");
 
   const searchInput = document.createElement("input");
   searchInput.id = "episode-search";
   searchInput.type = "search";
   searchInput.placeholder = "Search by name or summary";
 
-  const selectLabel = document.createElement("label");
-  selectLabel.setAttribute("for", "episode-select");
-  selectLabel.textContent = "Jump to episode";
+  const selectLabel = createLabel("episode-select", "Jump to episode");
 
   const episodeSelect = document.createElement("select");
   episodeSelect.id = "episode-select";
@@ -74,6 +70,13 @@ function createControls(allEpisodes) {
     episodeSelect,
     matchCount,
   };
+}
+
+function createLabel(forId, text) {
+  const label = document.createElement("label");
+  label.setAttribute("for", forId);
+  label.textContent = text;
+  return label;
 }
 
 function renderPage(allEpisodes, state, matchCountElem, rootElem) {

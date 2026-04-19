@@ -11,6 +11,7 @@ async function setup() {
   const state = {
     searchTerm: "",
     selectedEpisodeCode: "all",
+    selectedShowId: "",
   };
 
   rootElem.before(controls.container);
@@ -33,6 +34,8 @@ async function setup() {
       return;
     }
 
+    const previousShowId = state.selectedShowId;
+    const previousEpisodes = allEpisodes;
     const currentRequestId = ++showChangeRequestId;
 
     controls.matchCount.textContent = "Loading episodes...";
@@ -46,6 +49,7 @@ async function setup() {
       }
 
       allEpisodes = episodes;
+      state.selectedShowId = showId;
       state.searchTerm = "";
       controls.searchInput.value = "";
       state.selectedEpisodeCode = "all";
@@ -58,8 +62,12 @@ async function setup() {
       }
 
       console.error("Could not load episodes for selected show", error);
-      controls.matchCount.textContent =
-        "Could not load episodes for the selected show.";
+      if (previousShowId) {
+        controls.showSelect.value = previousShowId;
+      }
+
+      allEpisodes = previousEpisodes;
+      renderPage(allEpisodes, state, controls.matchCount, rootElem);
     } finally {
       if (currentRequestId === showChangeRequestId) {
         setEpisodeControlsLoading(controls, false);
@@ -71,6 +79,7 @@ async function setup() {
   if (initialShowId) {
     try {
       allEpisodes = await fetchEpisodesByShowId(initialShowId);
+      state.selectedShowId = initialShowId;
       updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
       setEpisodeControlsLoading(controls, false);
     } catch (error) {

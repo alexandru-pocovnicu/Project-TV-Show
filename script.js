@@ -16,7 +16,7 @@ async function setup() {
   };
 
   rootElem.before(controls.container);
-  controls.matchCount.textContent = "Loading shows...";
+  controls.matchCount.textContent = ""; 
   setEpisodeControlsLoading(controls, true);
 
   controls.searchInput.addEventListener("input", (event) => {

@@ -2,6 +2,7 @@
 
 const SHOWS_URL = "https://api.tvmaze.com/shows";
 const API_CACHE = new Map();
+let allShows = [];
 
 async function setup() {
   let allEpisodes = [];
@@ -97,7 +98,9 @@ async function setup() {
     return;
   }
 
-  renderPage(allEpisodes, state, controls.matchCount, rootElem);
+  // Fetch all shows and render the listing
+  allShows = await fetchShows();
+  renderShowsListing(allShows, rootElem);
 }
 
 async function fetchJsonCached(url) {
@@ -308,6 +311,27 @@ function createEpisodeCard(episode) {
   episodeContainer.classList.add("episode-container");
 
   return episodeContainer;
+}
+
+function renderShowsListing(shows, container) {
+  container.innerHTML = "";
+  const grid = document.createElement("div");
+  grid.className = "shows-listing";
+  shows.forEach((show) => {
+    const card = document.createElement("div");
+    card.className = "show-card";
+    card.innerHTML = `
+      <img src="${show.image ? show.image.medium : ""}" alt="${show.name}" />
+      <h2>${show.name}</h2>
+      <p><strong>Genres:</strong> ${show.genres.join(", ")}</p>
+      <p><strong>Status:</strong> ${show.status}</p>
+      <p><strong>Rating:</strong> ${show.rating && show.rating.average ? show.rating.average : "N/A"}</p>
+      <p><strong>Runtime:</strong> ${show.runtime ? show.runtime + " min" : "N/A"}</p>
+      <div class="summary">${show.summary || ""}</div>
+    `;
+    grid.appendChild(card);
+  });
+  container.appendChild(grid);
 }
 
 window.onload = setup;

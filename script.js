@@ -28,6 +28,13 @@ function createControls(allEpisodes) {
   const container = document.createElement("section");
   container.classList.add("controls");
 
+  const showLabel = document.createElement("label");
+  showLabel.setAttribute("for", "show-select");
+  showLabel.textContent = "Choose show";
+
+  const showSelect = document.createElement("select");
+  showSelect.id = "show-select";
+
   const searchLabel = document.createElement("label");
   searchLabel.setAttribute("for", "episode-search");
   searchLabel.textContent = "Search episodes";
@@ -61,6 +68,8 @@ function createControls(allEpisodes) {
   matchCount.classList.add("match-count");
 
   container.append(
+    showLabel,
+    showSelect,
     searchLabel,
     searchInput,
     selectLabel,
@@ -70,6 +79,7 @@ function createControls(allEpisodes) {
 
   return {
     container,
+    showSelect,
     searchInput,
     episodeSelect,
     matchCount,

@@ -5,6 +5,7 @@ const API_CACHE = new Map();
 
 async function setup() {
   let allEpisodes = [];
+  let showChangeRequestId = 0;
   const rootElem = document.getElementById("root");
   const controls = createControls();
   const state = {
@@ -32,12 +33,19 @@ async function setup() {
       return;
     }
 
+    const currentRequestId = ++showChangeRequestId;
+
     controls.matchCount.textContent = "Loading episodes...";
     rootElem.replaceChildren();
     setEpisodeControlsLoading(controls, true);
 
     try {
-      allEpisodes = await fetchEpisodesByShowId(showId);
+      const episodes = await fetchEpisodesByShowId(showId);
+      if (currentRequestId !== showChangeRequestId) {
+        return;
+      }
+
+      allEpisodes = episodes;
       state.searchTerm = "";
       controls.searchInput.value = "";
       state.selectedEpisodeCode = "all";

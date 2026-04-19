@@ -15,7 +15,6 @@ async function setup() {
     selectedShowId: "",
   };
 
-  // Insert nav bar before controls
   const navBar = document.getElementById("nav-bar");
   rootElem.before(navBar);
   rootElem.before(controls.container);
@@ -107,13 +106,12 @@ async function setup() {
   navBar.style.display = "none";
   controls.container.style.display = "";
 
-  // Navigation link handler
   document.getElementById("back-to-shows").addEventListener("click", (e) => {
     e.preventDefault();
-    // Hide episodes, show shows listing
     renderShowsListing(allShows, rootElem);
     navBar.style.display = "none";
     controls.container.style.display = "";
+    controls.showSelect.value = "";
   });
 }
 
@@ -394,7 +392,6 @@ function renderShowsListing(shows, container) {
     if (searchInput) searchInput.value = "";
     if (episodeSelect) episodeSelect.value = "all";
     if (showSelect) showSelect.dispatchEvent(new Event("change"));
-    // Hide shows listing, show nav bar
     const navBar = document.getElementById("nav-bar");
     navBar.style.display = "";
     const controls = document.querySelector(".controls");

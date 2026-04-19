@@ -3,7 +3,7 @@
 const SHOWS_URL = "https://api.tvmaze.com/shows";
 
 function setup() {
-  const allEpisodes = getAllEpisodes();
+  let allEpisodes = getAllEpisodes();
   const rootElem = document.getElementById("root");
   const controls = createControls(allEpisodes);
   const state = {
@@ -23,6 +23,19 @@ function setup() {
     renderPage(allEpisodes, state, controls.matchCount, rootElem);
   });
 
+  controls.showSelect.addEventListener("change", async (event) => {
+    const showId = event.target.value;
+    if (!showId) {
+      return;
+    }
+
+    allEpisodes = await fetchEpisodesByShowId(showId);
+    state.selectedEpisodeCode = "all";
+    controls.episodeSelect.value = "all";
+    updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
+    renderPage(allEpisodes, state, controls.matchCount, rootElem);
+  });
+
   initialiseShows(controls.showSelect);
 
   renderPage(allEpisodes, state, controls.matchCount, rootElem);
@@ -30,6 +43,19 @@ function setup() {
 
 async function fetchShows() {
   const response = await fetch(SHOWS_URL);
+  if (!response.ok) {
+    throw new Error(
+      `Request failed: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  return response.json();
+}
+
+async function fetchEpisodesByShowId(showId) {
+  const response = await fetch(
+    `https://api.tvmaze.com/shows/${showId}/episodes`,
+  );
   if (!response.ok) {
     throw new Error(
       `Request failed: ${response.status} ${response.statusText}`,
@@ -60,6 +86,23 @@ function populateShowSelect(showSelect, shows) {
     option.value = String(show.id);
     option.textContent = show.name;
     showSelect.append(option);
+  }
+}
+
+function updateEpisodeSelectOptions(episodeSelect, episodes) {
+  episodeSelect.replaceChildren();
+
+  const allEpisodesOption = document.createElement("option");
+  allEpisodesOption.value = "all";
+  allEpisodesOption.textContent = "All episodes";
+  episodeSelect.append(allEpisodesOption);
+
+  for (const episode of episodes) {
+    const option = document.createElement("option");
+    const episodeCode = getEpisodeCode(episode);
+    option.value = episodeCode;
+    option.textContent = `${episodeCode} - ${episode.name}`;
+    episodeSelect.append(option);
   }
 }
 

@@ -1,40 +1,22 @@
 // You can edit ALL of the code here
 
+const SHOWS_URL = "https://api.tvmaze.com/shows";
+const API_CACHE = new Map();
+
 async function setup() {
-  function fetchFilms() {
-    return fetch("https://api.tvmaze.com/shows/82/episodes").then(
-      function (data) {
-        return data.json();
-      },
-    );
-  }
+  let allEpisodes = [];
+  let showChangeRequestId = 0;
   const rootElem = document.getElementById("root");
-
-  let loading = true;
-
-  function showLoadingMessage() {
-    if (loading === true) {
-      rootElem.textContent = "Loading episode...";
-    }
-  }
-
-  showLoadingMessage()
-  let allEpisodes;
-  try{
-   allEpisodes = await fetchFilms();
-  }catch(error){
-    rootElem.textContent="Show not available, please try again later"
-  }
-
-  loading = false;
-
-  const controls = createControls(allEpisodes);
+  const controls = createControls();
   const state = {
     searchTerm: "",
     selectedEpisodeCode: "all",
+    selectedShowId: "",
   };
 
   rootElem.before(controls.container);
+  controls.matchCount.textContent = "Loading shows...";
+  setEpisodeControlsLoading(controls, true);
 
   controls.searchInput.addEventListener("input", (event) => {
     state.searchTerm = event.target.value.trim().toLowerCase();
@@ -46,16 +28,177 @@ async function setup() {
     renderPage(allEpisodes, state, controls.matchCount, rootElem);
   });
 
+  controls.showSelect.addEventListener("change", async (event) => {
+    const showId = event.target.value;
+    if (!showId) {
+      return;
+    }
+
+    const previousShowId = state.selectedShowId;
+    const previousEpisodes = allEpisodes;
+    const currentRequestId = ++showChangeRequestId;
+
+    controls.matchCount.textContent = "Loading episodes...";
+    rootElem.replaceChildren();
+    setEpisodeControlsLoading(controls, true);
+
+    try {
+      const episodes = await fetchEpisodesByShowId(showId);
+      if (currentRequestId !== showChangeRequestId) {
+        return;
+      }
+
+      allEpisodes = episodes;
+      state.selectedShowId = showId;
+      state.searchTerm = "";
+      controls.searchInput.value = "";
+      state.selectedEpisodeCode = "all";
+      controls.episodeSelect.value = "all";
+      updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
+      renderPage(allEpisodes, state, controls.matchCount, rootElem);
+    } catch (error) {
+      if (currentRequestId !== showChangeRequestId) {
+        return;
+      }
+
+      console.error("Could not load episodes for selected show", error);
+      if (previousShowId) {
+        controls.showSelect.value = previousShowId;
+      }
+
+      allEpisodes = previousEpisodes;
+      renderPage(allEpisodes, state, controls.matchCount, rootElem);
+    } finally {
+      if (currentRequestId === showChangeRequestId) {
+        setEpisodeControlsLoading(controls, false);
+      }
+    }
+  });
+
+  const initialShowId = await initialiseShows(controls.showSelect);
+  if (initialShowId) {
+    try {
+      allEpisodes = await fetchEpisodesByShowId(initialShowId);
+      state.selectedShowId = initialShowId;
+      updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
+      setEpisodeControlsLoading(controls, false);
+    } catch (error) {
+      controls.matchCount.textContent =
+        "Could not load episodes for the selected show.";
+      console.error("Could not load episodes for initial show", error);
+      setEpisodeControlsLoading(controls, false);
+      return;
+    }
+  } else {
+    controls.matchCount.textContent = "No shows available right now.";
+    setEpisodeControlsLoading(controls, false);
+    return;
+  }
+
   renderPage(allEpisodes, state, controls.matchCount, rootElem);
 }
 
+async function fetchJsonCached(url) {
+  if (API_CACHE.has(url)) {
+    return API_CACHE.get(url);
+  }
 
+  const requestPromise = fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(
+          `Request failed: ${response.status} ${response.statusText}`,
+        );
+      }
 
-function createControls(allEpisodes) {
+      return response.json();
+    })
+    .catch((error) => {
+      API_CACHE.delete(url);
+      throw error;
+    });
+
+  API_CACHE.set(url, requestPromise);
+  return requestPromise;
+}
+
+async function fetchShows() {
+  return fetchJsonCached(SHOWS_URL);
+}
+
+async function fetchEpisodesByShowId(showId) {
+  return fetchJsonCached(`https://api.tvmaze.com/shows/${showId}/episodes`);
+}
+
+async function initialiseShows(showSelect) {
+  try {
+    const shows = await fetchShows();
+    const sortedShows = [...shows].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+    );
+
+    populateShowSelect(showSelect, sortedShows);
+    if (sortedShows.length === 0) {
+      return "";
+    }
+
+    const firstShowId = String(sortedShows[0].id);
+    showSelect.value = firstShowId;
+    return firstShowId;
+  } catch (error) {
+    console.error("Could not load shows", error);
+    return "";
+  }
+}
+
+function populateShowSelect(showSelect, shows) {
+  showSelect.replaceChildren();
+
+  for (const show of shows) {
+    const option = document.createElement("option");
+    option.value = String(show.id);
+    option.textContent = show.name;
+    showSelect.append(option);
+  }
+}
+
+function updateEpisodeSelectOptions(episodeSelect, episodes) {
+  episodeSelect.replaceChildren();
+
+  const allEpisodesOption = document.createElement("option");
+  allEpisodesOption.value = "all";
+  allEpisodesOption.textContent = "All episodes";
+  episodeSelect.append(allEpisodesOption);
+
+  for (const episode of episodes) {
+    const option = document.createElement("option");
+    const episodeCode = getEpisodeCode(episode);
+    option.value = episodeCode;
+    option.textContent = `${episodeCode} - ${episode.name}`;
+    episodeSelect.append(option);
+  }
+}
+
+function setEpisodeControlsLoading(controls, isLoading) {
+  controls.showSelect.disabled = isLoading;
+  controls.searchInput.disabled = isLoading;
+  controls.episodeSelect.disabled = isLoading;
+}
+
+function createControls() {
   const container = document.createElement("section");
   container.classList.add("controls");
 
-  const searchLabel = createLabel("episode-search", "Search episodes");
+  const showLabel = document.createElement("label");
+  showLabel.setAttribute("for", "show-select");
+  showLabel.textContent = "Choose show";
+
+  const showSelect = document.createElement("select");
+  showSelect.id = "show-select";
+
+  const searchLabel = document.createElement("label");
+  searchLabel.setAttribute("for", "episode-search");
+  searchLabel.textContent = "Search episodes";
 
   const searchInput = document.createElement("input");
   searchInput.id = "episode-search";
@@ -72,18 +215,12 @@ function createControls(allEpisodes) {
   allEpisodesOption.textContent = "All episodes";
   episodeSelect.append(allEpisodesOption);
 
-  for (const episode of allEpisodes) {
-    const option = document.createElement("option");
-    const episodeCode = getEpisodeCode(episode);
-    option.value = episodeCode;
-    option.textContent = `${episodeCode} - ${episode.name}`;
-    episodeSelect.append(option);
-  }
-
   const matchCount = document.createElement("p");
   matchCount.classList.add("match-count");
 
   container.append(
+    showLabel,
+    showSelect,
     searchLabel,
     searchInput,
     selectLabel,
@@ -93,6 +230,7 @@ function createControls(allEpisodes) {
 
   return {
     container,
+    showSelect,
     searchInput,
     episodeSelect,
     matchCount,
@@ -131,7 +269,7 @@ function episodeMatchesSearch(episode, searchTerm) {
   }
 
   const name = episode.name.toLowerCase();
-  const summary = stripHtml(episode.summary).toLowerCase();
+  const summary = stripHtml(episode.summary || "").toLowerCase();
 
   return name.includes(searchTerm) || summary.includes(searchTerm);
 }
@@ -156,7 +294,7 @@ function createEpisodeCard(episode) {
   episodeTitle.textContent = `${name} - ${episodeCode}`;
 
   const episodeSummary = document.createElement("p");
-  episodeSummary.innerHTML = summary;
+  episodeSummary.innerHTML = summary || "No summary available.";
 
   const mediumImage = document.createElement("img");
   mediumImage.src = image?.medium || "";

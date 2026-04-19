@@ -313,11 +313,12 @@ function createEpisodeCard(episode) {
   return episodeContainer;
 }
 
-function createShowCard(show) {
-  const { name, summary, image, genres, status, rating, runtime } = show;
+function createShowCard(show, onSelect) {
+  const { id, name, summary, image, genres, status, rating, runtime } = show;
 
   const showTitle = document.createElement("h2");
   showTitle.textContent = name;
+  showTitle.style.cursor = "pointer";
 
   const showSummary = document.createElement("p");
   showSummary.innerHTML = summary || "No summary available.";
@@ -325,6 +326,7 @@ function createShowCard(show) {
   const mediumImage = document.createElement("img");
   mediumImage.src = image?.medium || "";
   mediumImage.alt = name;
+  mediumImage.style.cursor = "pointer";
 
   const genresElem = document.createElement("p");
   genresElem.innerHTML = `<strong>Genres:</strong> ${genres.join(", ")}`;
@@ -340,6 +342,7 @@ function createShowCard(show) {
 
   const showContainer = document.createElement("article");
   showContainer.classList.add("episode-container");
+  showContainer.style.cursor = "pointer";
   showContainer.append(
     showTitle,
     mediumImage,
@@ -350,13 +353,37 @@ function createShowCard(show) {
     showSummary,
   );
 
+  const handleSelect = (e) => {
+    e.stopPropagation();
+    if (onSelect) onSelect(id);
+  };
+  showContainer.addEventListener("click", handleSelect);
+  showTitle.addEventListener("click", handleSelect);
+  mediumImage.addEventListener("click", handleSelect);
+
   return showContainer;
 }
 
 function renderShowsListing(shows, container) {
   container.innerHTML = "";
+  const controls = document.querySelector(".controls");
+  const showSelect = controls?.querySelector("#show-select");
+  const matchCount = controls?.querySelector(".match-count");
+  const searchInput = controls?.querySelector("#episode-search");
+  const episodeSelect = controls?.querySelector("#episode-select");
+
+  const handleShowSelect = async (showId) => {
+    if (!showSelect) return;
+    showSelect.value = showId;
+    if (matchCount) matchCount.textContent = "Loading episodes...";
+    if (container) container.innerHTML = "";
+    if (searchInput) searchInput.value = "";
+    if (episodeSelect) episodeSelect.value = "all";
+    if (showSelect) showSelect.dispatchEvent(new Event("change"));
+  };
+
   shows.forEach((show) => {
-    const showCard = createShowCard(show);
+    const showCard = createShowCard(show, handleShowSelect);
     container.appendChild(showCard);
   });
 }

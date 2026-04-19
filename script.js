@@ -46,8 +46,15 @@ async function setup() {
 
   const initialShowId = await initialiseShows(controls.showSelect);
   if (initialShowId) {
-    allEpisodes = await fetchEpisodesByShowId(initialShowId);
-    updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
+    try {
+      allEpisodes = await fetchEpisodesByShowId(initialShowId);
+      updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
+    } catch (error) {
+      controls.matchCount.textContent =
+        "Could not load episodes for the selected show.";
+      console.error("Could not load episodes for initial show", error);
+      return;
+    }
   } else {
     controls.matchCount.textContent = "No shows available right now.";
     return;

@@ -68,16 +68,23 @@ async function fetchJsonCached(url) {
     return API_CACHE.get(url);
   }
 
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(
-      `Request failed: ${response.status} ${response.statusText}`,
-    );
-  }
+  const requestPromise = fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(
+          `Request failed: ${response.status} ${response.statusText}`,
+        );
+      }
 
-  const data = await response.json();
-  API_CACHE.set(url, data);
-  return data;
+      return response.json();
+    })
+    .catch((error) => {
+      API_CACHE.delete(url);
+      throw error;
+    });
+
+  API_CACHE.set(url, requestPromise);
+  return requestPromise;
 }
 
 async function fetchShows() {

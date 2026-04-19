@@ -25,6 +25,8 @@ async function setup() {
 
   controls.episodeSelect.addEventListener("change", (event) => {
     state.selectedEpisodeCode = event.target.value;
+    controls.searchInput.value = "";
+    state.searchTerm = "";
     renderPage(allEpisodes, state, controls.matchCount, rootElem);
   });
 

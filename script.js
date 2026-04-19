@@ -13,6 +13,7 @@ async function setup() {
   };
 
   rootElem.before(controls.container);
+  controls.matchCount.textContent = "Loading shows...";
 
   controls.searchInput.addEventListener("input", (event) => {
     state.searchTerm = event.target.value.trim().toLowerCase();
@@ -47,6 +48,9 @@ async function setup() {
   if (initialShowId) {
     allEpisodes = await fetchEpisodesByShowId(initialShowId);
     updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
+  } else {
+    controls.matchCount.textContent = "No shows available right now.";
+    return;
   }
 
   renderPage(allEpisodes, state, controls.matchCount, rootElem);

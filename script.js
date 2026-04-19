@@ -53,11 +53,17 @@ async function setup() {
       updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
       renderPage(allEpisodes, state, controls.matchCount, rootElem);
     } catch (error) {
+      if (currentRequestId !== showChangeRequestId) {
+        return;
+      }
+
       console.error("Could not load episodes for selected show", error);
       controls.matchCount.textContent =
         "Could not load episodes for the selected show.";
     } finally {
-      setEpisodeControlsLoading(controls, false);
+      if (currentRequestId === showChangeRequestId) {
+        setEpisodeControlsLoading(controls, false);
+      }
     }
   });
 

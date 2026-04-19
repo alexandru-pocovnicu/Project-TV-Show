@@ -30,6 +30,8 @@ function setup() {
     }
 
     allEpisodes = await fetchEpisodesByShowId(showId);
+    state.searchTerm = "";
+    controls.searchInput.value = "";
     state.selectedEpisodeCode = "all";
     controls.episodeSelect.value = "all";
     updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);

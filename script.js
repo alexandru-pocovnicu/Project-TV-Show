@@ -4,9 +4,9 @@ const SHOWS_URL = "https://api.tvmaze.com/shows";
 const API_CACHE = new Map();
 
 async function setup() {
-  let allEpisodes = getAllEpisodes();
+  let allEpisodes = [];
   const rootElem = document.getElementById("root");
-  const controls = createControls(allEpisodes);
+  const controls = createControls();
   const state = {
     searchTerm: "",
     selectedEpisodeCode: "all",
@@ -122,7 +122,7 @@ function updateEpisodeSelectOptions(episodeSelect, episodes) {
   }
 }
 
-function createControls(allEpisodes) {
+function createControls() {
   const container = document.createElement("section");
   container.classList.add("controls");
 
@@ -153,14 +153,6 @@ function createControls(allEpisodes) {
   allEpisodesOption.value = "all";
   allEpisodesOption.textContent = "All episodes";
   episodeSelect.append(allEpisodesOption);
-
-  for (const episode of allEpisodes) {
-    const option = document.createElement("option");
-    const episodeCode = getEpisodeCode(episode);
-    option.value = episodeCode;
-    option.textContent = `${episodeCode} - ${episode.name}`;
-    episodeSelect.append(option);
-  }
 
   const matchCount = document.createElement("p");
   matchCount.classList.add("match-count");

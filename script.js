@@ -30,13 +30,17 @@ async function setup() {
       return;
     }
 
-    allEpisodes = await fetchEpisodesByShowId(showId);
-    state.searchTerm = "";
-    controls.searchInput.value = "";
-    state.selectedEpisodeCode = "all";
-    controls.episodeSelect.value = "all";
-    updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
-    renderPage(allEpisodes, state, controls.matchCount, rootElem);
+    try {
+      allEpisodes = await fetchEpisodesByShowId(showId);
+      state.searchTerm = "";
+      controls.searchInput.value = "";
+      state.selectedEpisodeCode = "all";
+      controls.episodeSelect.value = "all";
+      updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
+      renderPage(allEpisodes, state, controls.matchCount, rootElem);
+    } catch (error) {
+      console.error("Could not load episodes for selected show", error);
+    }
   });
 
   const initialShowId = await initialiseShows(controls.showSelect);

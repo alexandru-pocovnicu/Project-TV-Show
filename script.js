@@ -16,7 +16,7 @@ async function setup() {
   };
 
   rootElem.before(controls.container);
-  controls.matchCount.textContent = ""; 
+  controls.matchCount.textContent = "";
   setEpisodeControlsLoading(controls, true);
 
   controls.searchInput.addEventListener("input", (event) => {
@@ -313,25 +313,52 @@ function createEpisodeCard(episode) {
   return episodeContainer;
 }
 
+function createShowCard(show) {
+  const { name, summary, image, genres, status, rating, runtime } = show;
+
+  const showTitle = document.createElement("h2");
+  showTitle.textContent = name;
+
+  const showSummary = document.createElement("p");
+  showSummary.innerHTML = summary || "No summary available.";
+
+  const mediumImage = document.createElement("img");
+  mediumImage.src = image?.medium || "";
+  mediumImage.alt = name;
+
+  const genresElem = document.createElement("p");
+  genresElem.innerHTML = `<strong>Genres:</strong> ${genres.join(", ")}`;
+
+  const statusElem = document.createElement("p");
+  statusElem.innerHTML = `<strong>Status:</strong> ${status}`;
+
+  const ratingElem = document.createElement("p");
+  ratingElem.innerHTML = `<strong>Rating:</strong> ${rating && rating.average ? rating.average : "N/A"}`;
+
+  const runtimeElem = document.createElement("p");
+  runtimeElem.innerHTML = `<strong>Runtime:</strong> ${runtime ? runtime + " min" : "N/A"}`;
+
+  const showContainer = document.createElement("article");
+  showContainer.classList.add("episode-container");
+  showContainer.append(
+    showTitle,
+    mediumImage,
+    genresElem,
+    statusElem,
+    ratingElem,
+    runtimeElem,
+    showSummary,
+  );
+
+  return showContainer;
+}
+
 function renderShowsListing(shows, container) {
   container.innerHTML = "";
-  const grid = document.createElement("div");
-  grid.className = "shows-listing";
   shows.forEach((show) => {
-    const card = document.createElement("div");
-    card.className = "show-card";
-    card.innerHTML = `
-      <img src="${show.image ? show.image.medium : ""}" alt="${show.name}" />
-      <h2>${show.name}</h2>
-      <p><strong>Genres:</strong> ${show.genres.join(", ")}</p>
-      <p><strong>Status:</strong> ${show.status}</p>
-      <p><strong>Rating:</strong> ${show.rating && show.rating.average ? show.rating.average : "N/A"}</p>
-      <p><strong>Runtime:</strong> ${show.runtime ? show.runtime + " min" : "N/A"}</p>
-      <div class="summary">${show.summary || ""}</div>
-    `;
-    grid.appendChild(card);
+    const showCard = createShowCard(show);
+    container.appendChild(showCard);
   });
-  container.appendChild(grid);
 }
 
 window.onload = setup;

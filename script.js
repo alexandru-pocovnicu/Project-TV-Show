@@ -15,6 +15,9 @@ async function setup() {
     selectedShowId: "",
   };
 
+  // Insert nav bar before controls
+  const navBar = document.getElementById("nav-bar");
+  rootElem.before(navBar);
   rootElem.before(controls.container);
   controls.matchCount.textContent = "";
   setEpisodeControlsLoading(controls, true);
@@ -101,6 +104,17 @@ async function setup() {
   // Fetch all shows and render the listing
   allShows = await fetchShows();
   renderShowsListing(allShows, rootElem);
+  navBar.style.display = "none";
+  controls.container.style.display = "";
+
+  // Navigation link handler
+  document.getElementById("back-to-shows").addEventListener("click", (e) => {
+    e.preventDefault();
+    // Hide episodes, show shows listing
+    renderShowsListing(allShows, rootElem);
+    navBar.style.display = "none";
+    controls.container.style.display = "";
+  });
 }
 
 async function fetchJsonCached(url) {
@@ -380,6 +394,11 @@ function renderShowsListing(shows, container) {
     if (searchInput) searchInput.value = "";
     if (episodeSelect) episodeSelect.value = "all";
     if (showSelect) showSelect.dispatchEvent(new Event("change"));
+    // Hide shows listing, show nav bar
+    const navBar = document.getElementById("nav-bar");
+    navBar.style.display = "";
+    const controls = document.querySelector(".controls");
+    if (controls) controls.style.display = "";
   };
 
   shows.forEach((show) => {

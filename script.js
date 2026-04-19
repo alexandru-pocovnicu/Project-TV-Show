@@ -1,6 +1,7 @@
 // You can edit ALL of the code here
 
 const SHOWS_URL = "https://api.tvmaze.com/shows";
+const API_CACHE = new Map();
 
 function setup() {
   let allEpisodes = getAllEpisodes();
@@ -43,28 +44,29 @@ function setup() {
   renderPage(allEpisodes, state, controls.matchCount, rootElem);
 }
 
-async function fetchShows() {
-  const response = await fetch(SHOWS_URL);
+async function fetchJsonCached(url) {
+  if (API_CACHE.has(url)) {
+    return API_CACHE.get(url);
+  }
+
+  const response = await fetch(url);
   if (!response.ok) {
     throw new Error(
       `Request failed: ${response.status} ${response.statusText}`,
     );
   }
 
-  return response.json();
+  const data = await response.json();
+  API_CACHE.set(url, data);
+  return data;
+}
+
+async function fetchShows() {
+  return fetchJsonCached(SHOWS_URL);
 }
 
 async function fetchEpisodesByShowId(showId) {
-  const response = await fetch(
-    `https://api.tvmaze.com/shows/${showId}/episodes`,
-  );
-  if (!response.ok) {
-    throw new Error(
-      `Request failed: ${response.status} ${response.statusText}`,
-    );
-  }
-
-  return response.json();
+  return fetchJsonCached(`https://api.tvmaze.com/shows/${showId}/episodes`);
 }
 
 async function initialiseShows(showSelect) {

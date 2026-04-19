@@ -1,5 +1,7 @@
 // You can edit ALL of the code here
 
+const SHOWS_URL = "https://api.tvmaze.com/shows";
+
 function setup() {
   const allEpisodes = getAllEpisodes();
   const rootElem = document.getElementById("root");
@@ -21,7 +23,44 @@ function setup() {
     renderPage(allEpisodes, state, controls.matchCount, rootElem);
   });
 
+  initialiseShows(controls.showSelect);
+
   renderPage(allEpisodes, state, controls.matchCount, rootElem);
+}
+
+async function fetchShows() {
+  const response = await fetch(SHOWS_URL);
+  if (!response.ok) {
+    throw new Error(
+      `Request failed: ${response.status} ${response.statusText}`,
+    );
+  }
+
+  return response.json();
+}
+
+async function initialiseShows(showSelect) {
+  try {
+    const shows = await fetchShows();
+    const sortedShows = [...shows].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+    );
+
+    populateShowSelect(showSelect, sortedShows);
+  } catch (error) {
+    console.error("Could not load shows", error);
+  }
+}
+
+function populateShowSelect(showSelect, shows) {
+  showSelect.replaceChildren();
+
+  for (const show of shows) {
+    const option = document.createElement("option");
+    option.value = String(show.id);
+    option.textContent = show.name;
+    showSelect.append(option);
+  }
 }
 
 function createControls(allEpisodes) {

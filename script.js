@@ -3,7 +3,7 @@
 const SHOWS_URL = "https://api.tvmaze.com/shows";
 const API_CACHE = new Map();
 
-function setup() {
+async function setup() {
   let allEpisodes = getAllEpisodes();
   const rootElem = document.getElementById("root");
   const controls = createControls(allEpisodes);
@@ -39,7 +39,11 @@ function setup() {
     renderPage(allEpisodes, state, controls.matchCount, rootElem);
   });
 
-  initialiseShows(controls.showSelect);
+  const initialShowId = await initialiseShows(controls.showSelect);
+  if (initialShowId) {
+    allEpisodes = await fetchEpisodesByShowId(initialShowId);
+    updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
+  }
 
   renderPage(allEpisodes, state, controls.matchCount, rootElem);
 }
@@ -77,8 +81,16 @@ async function initialiseShows(showSelect) {
     );
 
     populateShowSelect(showSelect, sortedShows);
+    if (sortedShows.length === 0) {
+      return "";
+    }
+
+    const firstShowId = String(sortedShows[0].id);
+    showSelect.value = firstShowId;
+    return firstShowId;
   } catch (error) {
     console.error("Could not load shows", error);
+    return "";
   }
 }
 

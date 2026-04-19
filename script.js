@@ -14,6 +14,7 @@ async function setup() {
 
   rootElem.before(controls.container);
   controls.matchCount.textContent = "Loading shows...";
+  setEpisodeControlsLoading(controls, true);
 
   controls.searchInput.addEventListener("input", (event) => {
     state.searchTerm = event.target.value.trim().toLowerCase();
@@ -33,6 +34,7 @@ async function setup() {
 
     controls.matchCount.textContent = "Loading episodes...";
     rootElem.replaceChildren();
+    setEpisodeControlsLoading(controls, true);
 
     try {
       allEpisodes = await fetchEpisodesByShowId(showId);
@@ -44,6 +46,10 @@ async function setup() {
       renderPage(allEpisodes, state, controls.matchCount, rootElem);
     } catch (error) {
       console.error("Could not load episodes for selected show", error);
+      controls.matchCount.textContent =
+        "Could not load episodes for the selected show.";
+    } finally {
+      setEpisodeControlsLoading(controls, false);
     }
   });
 
@@ -52,14 +58,17 @@ async function setup() {
     try {
       allEpisodes = await fetchEpisodesByShowId(initialShowId);
       updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
+      setEpisodeControlsLoading(controls, false);
     } catch (error) {
       controls.matchCount.textContent =
         "Could not load episodes for the selected show.";
       console.error("Could not load episodes for initial show", error);
+      setEpisodeControlsLoading(controls, false);
       return;
     }
   } else {
     controls.matchCount.textContent = "No shows available right now.";
+    setEpisodeControlsLoading(controls, false);
     return;
   }
 
@@ -145,6 +154,11 @@ function updateEpisodeSelectOptions(episodeSelect, episodes) {
     option.textContent = `${episodeCode} - ${episode.name}`;
     episodeSelect.append(option);
   }
+}
+
+function setEpisodeControlsLoading(controls, isLoading) {
+  controls.searchInput.disabled = isLoading;
+  controls.episodeSelect.disabled = isLoading;
 }
 
 function createControls() {

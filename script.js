@@ -249,7 +249,7 @@ function episodeMatchesSearch(episode, searchTerm) {
   }
 
   const name = episode.name.toLowerCase();
-  const summary = stripHtml(episode.summary).toLowerCase();
+  const summary = stripHtml(episode.summary || "").toLowerCase();
 
   return name.includes(searchTerm) || summary.includes(searchTerm);
 }
@@ -274,7 +274,7 @@ function createEpisodeCard(episode) {
   episodeTitle.textContent = `${name} - ${episodeCode}`;
 
   const episodeSummary = document.createElement("p");
-  episodeSummary.innerHTML = summary;
+  episodeSummary.innerHTML = summary || "No summary available.";
 
   const mediumImage = document.createElement("img");
   mediumImage.src = image?.medium || "";

@@ -165,6 +165,7 @@ function updateEpisodeSelectOptions(episodeSelect, episodes) {
 }
 
 function setEpisodeControlsLoading(controls, isLoading) {
+  controls.showSelect.disabled = isLoading;
   controls.searchInput.disabled = isLoading;
   controls.episodeSelect.disabled = isLoading;
 }

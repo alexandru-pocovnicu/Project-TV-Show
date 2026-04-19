@@ -31,6 +31,9 @@ async function setup() {
       return;
     }
 
+    controls.matchCount.textContent = "Loading episodes...";
+    rootElem.replaceChildren();
+
     try {
       allEpisodes = await fetchEpisodesByShowId(showId);
       state.searchTerm = "";

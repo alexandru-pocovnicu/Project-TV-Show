@@ -206,6 +206,15 @@ function createControls() {
   const container = document.createElement("section");
   container.classList.add("controls");
 
+  const showSearchLabel = document.createElement("label");
+  showSearchLabel.setAttribute("for", "show-search");
+  showSearchLabel.textContent = "Search shows";
+
+  const showSearchInput = document.createElement("input");
+  showSearchInput.id = "show-search";
+  showSearchInput.type = "search";
+  showSearchInput.placeholder = "Search by name, genre, or summary";
+
   const showLabel = document.createElement("label");
   showLabel.setAttribute("for", "show-select");
   showLabel.textContent = "Choose show";
@@ -236,6 +245,8 @@ function createControls() {
   matchCount.classList.add("match-count");
 
   container.append(
+    showSearchLabel,
+    showSearchInput,
     showLabel,
     showSelect,
     searchLabel,
@@ -247,6 +258,7 @@ function createControls() {
 
   return {
     container,
+    showSearchInput,
     showSelect,
     searchInput,
     episodeSelect,
@@ -376,6 +388,18 @@ function createShowCard(show, onSelect) {
   return showContainer;
 }
 
+function showMatchesSearch(show, searchTerm) {
+  if (!searchTerm) return true;
+  const name = show.name.toLowerCase();
+  const summary = (show.summary ? show.summary : "").toLowerCase();
+  const genres = (show.genres ? show.genres.join(", ") : "").toLowerCase();
+  return (
+    name.includes(searchTerm) ||
+    summary.includes(searchTerm) ||
+    genres.includes(searchTerm)
+  );
+}
+
 function renderShowsListing(shows, container) {
   container.innerHTML = "";
   const controls = document.querySelector(".controls");
@@ -383,6 +407,20 @@ function renderShowsListing(shows, container) {
   const matchCount = controls?.querySelector(".match-count");
   const searchInput = controls?.querySelector("#episode-search");
   const episodeSelect = controls?.querySelector("#episode-select");
+  const showSearchInput = controls?.querySelector("#show-search");
+
+  let searchTerm = "";
+  if (showSearchInput) {
+    searchTerm = showSearchInput.value.trim().toLowerCase();
+  }
+
+  const filteredShows = shows.filter((show) =>
+    showMatchesSearch(show, searchTerm),
+  );
+
+  if (matchCount) {
+    matchCount.textContent = `Displaying ${filteredShows.length}/${shows.length} shows`;
+  }
 
   const handleShowSelect = async (showId) => {
     if (!showSelect) return;
@@ -398,10 +436,18 @@ function renderShowsListing(shows, container) {
     if (controls) controls.style.display = "";
   };
 
-  shows.forEach((show) => {
+  filteredShows.forEach((show) => {
     const showCard = createShowCard(show, handleShowSelect);
     container.appendChild(showCard);
   });
+
+  // Add event listener for show search input (if not already added)
+  if (showSearchInput && !showSearchInput._listenerAdded) {
+    showSearchInput.addEventListener("input", () => {
+      renderShowsListing(shows, container);
+    });
+    showSearchInput._listenerAdded = true;
+  }
 }
 
 window.onload = setup;

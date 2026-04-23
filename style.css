@@ -9,7 +9,7 @@
 }
 
 body {
-  background-color: rgb(8, 8, 47);
+  background-color: rgb(147, 132, 135);
   margin: 0;
   padding: clamp(12px, 3vw, 28px);
 }

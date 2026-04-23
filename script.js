@@ -39,6 +39,14 @@ async function setup() {
       return;
     }
 
+    if (showId === "all-shows") {
+      renderShowsListing(allShows, rootElem);
+      navBar.style.display = "none";
+      controls.container.style.display = "";
+      controls.showSelect.value = "all-shows";
+      return;
+    }
+    
     const previousShowId = state.selectedShowId;
     const previousEpisodes = allEpisodes;
     const currentRequestId = ++showChangeRequestId;
@@ -170,6 +178,11 @@ async function initialiseShows(showSelect) {
 
 function populateShowSelect(showSelect, shows) {
   showSelect.replaceChildren();
+
+  const allShowsOption = document.createElement("option");
+  allShowsOption.value = "all-shows";
+  allShowsOption.textContent = "All shows";
+  showSelect.append(allShowsOption);
 
   for (const show of shows) {
     const option = document.createElement("option");

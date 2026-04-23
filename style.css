@@ -1,5 +1,5 @@
 #root {
-  background-color: rgb(114, 113, 111);
+  background-color: rgb(161, 159, 151);
   border: solid rgb(209, 211, 204);
   padding-top:10px;
   color: rgb(14, 14, 14);
@@ -17,7 +17,7 @@ body {
 .controls {
   padding: 10px;
   border-radius: 5px;
-  background-color: rgb(114, 113, 111);
+  background-color: rgb(161, 159, 151);
   display: grid;
   gap: 8px;
   margin-bottom: 18px;

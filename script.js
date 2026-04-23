@@ -100,7 +100,7 @@ async function setup() {
     return;
   }
 
-  // Fetch all shows and render the listing
+ 
   allShows = await fetchShows();
   renderShowsListing(allShows, rootElem);
   navBar.style.display = "none";
@@ -170,6 +170,11 @@ async function initialiseShows(showSelect) {
 
 function populateShowSelect(showSelect, shows) {
   showSelect.replaceChildren();
+
+  const backOption = document.createElement("option");
+  backOption.value = "back-to-shows";
+  backOption.textContent = "All shows";
+  showSelect.append(backOption);
 
   for (const show of shows) {
     const option = document.createElement("option");

@@ -5,7 +5,6 @@ const API_CACHE = new Map();
 let allShows = [];
 
 async function setup() {
-  
   let allEpisodes = [];
   let showChangeRequestId = 0;
   const rootElem = document.getElementById("root");
@@ -39,9 +38,9 @@ async function setup() {
     if (!showId) {
       return;
     }
-document
-  .querySelectorAll(".episode-control")
-  .forEach((el) => (el.style.display = "block"));
+    document
+      .querySelectorAll(".episode-control")
+      .forEach((el) => (el.style.display = "block"));
     if (showId === "all-shows") {
       document
         .querySelectorAll(".episode-control")
@@ -83,6 +82,7 @@ document
       controls.episodeSelect.value = "all";
       updateEpisodeSelectOptions(controls.episodeSelect, allEpisodes);
       renderPage(allEpisodes, state, controls.matchCount, rootElem);
+      navBar.style.display = "";
     } catch (error) {
       if (currentRequestId !== showChangeRequestId) {
         return;
@@ -122,7 +122,6 @@ document
     return;
   }
 
-  
   allShows = await fetchShows();
   renderShowsListing(allShows, rootElem);
   navBar.style.display = "none";
@@ -252,23 +251,23 @@ function createControls() {
   const showSelect = document.createElement("select");
   showSelect.id = "show-select";
 
-    const searchLabel = document.createElement("label");
-    searchLabel.setAttribute("for", "episode-search");
-    searchLabel.textContent = "Search episodes";
-    searchLabel.classList.add("episode-control");
+  const searchLabel = document.createElement("label");
+  searchLabel.setAttribute("for", "episode-search");
+  searchLabel.textContent = "Search episodes";
+  searchLabel.classList.add("episode-control");
 
-    const searchInput = document.createElement("input");
-    searchInput.id = "episode-search";
-    searchInput.type = "search";
-    searchInput.placeholder = "Search by name or summary";
-    searchInput.classList.add("episode-control");
+  const searchInput = document.createElement("input");
+  searchInput.id = "episode-search";
+  searchInput.type = "search";
+  searchInput.placeholder = "Search by name or summary";
+  searchInput.classList.add("episode-control");
 
-    const selectLabel = createLabel("episode-select", "Jump to episode");
-    selectLabel.classList.add("episode-control");
+  const selectLabel = createLabel("episode-select", "Jump to episode");
+  selectLabel.classList.add("episode-control");
 
-    const episodeSelect = document.createElement("select");
-    episodeSelect.id = "episode-select";
-    episodeSelect.classList.add("episode-control");
+  const episodeSelect = document.createElement("select");
+  episodeSelect.id = "episode-select";
+  episodeSelect.classList.add("episode-control");
 
   const allEpisodesOption = document.createElement("option");
   allEpisodesOption.value = "all";
@@ -308,7 +307,6 @@ function createLabel(forId, text) {
 }
 
 function renderPage(allEpisodes, state, matchCountElem, rootElem) {
-  
   const filteredEpisodes = allEpisodes.filter((episode) => {
     const matchesSearch = episodeMatchesSearch(episode, state.searchTerm);
     const matchesSelect =
@@ -476,7 +474,6 @@ function renderShowsListing(shows, container) {
     container.appendChild(showCard);
   });
 
- 
   if (showSearchInput && !showSearchInput._listenerAdded) {
     showSearchInput.addEventListener("input", () => {
       renderShowsListing(shows, container);

@@ -70,5 +70,11 @@ footer {
   left: 0;
   right: 0;
 }
+#back-to-shows{
+  background-color: rgb(175, 207, 236);
+  padding: 10px;
+  border-radius: 4px;
+  border: solid;
+}
 
 

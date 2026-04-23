@@ -1,7 +1,7 @@
 #root {
   background-color: rgb(161, 159, 151);
   border: solid rgb(209, 211, 204);
-  padding-top:10px;
+  padding-top: 10px;
   color: rgb(14, 14, 14);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -43,8 +43,15 @@ body {
   margin-inline: auto;
 }
 
+.episode-container img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 img {
-  width: 100%;
+  width: 300px;
+  max-width: 100%;
   height: auto;
   margin: 0;
 }
@@ -55,11 +62,13 @@ img {
   }
 }
 
-footer{
+footer {
   background-color: aquamarine;
   text-align: center;
   position: fixed;
- bottom: 0;
- left: 0;
- right: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
+
+

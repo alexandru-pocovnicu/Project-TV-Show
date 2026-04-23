@@ -243,19 +243,23 @@ function createControls() {
   const showSelect = document.createElement("select");
   showSelect.id = "show-select";
 
-  const searchLabel = document.createElement("label");
-  searchLabel.setAttribute("for", "episode-search");
-  searchLabel.textContent = "Search episodes";
+    const searchLabel = document.createElement("label");
+    searchLabel.setAttribute("for", "episode-search");
+    searchLabel.textContent = "Search episodes";
+    searchLabel.classList.add("episode-control");
 
-  const searchInput = document.createElement("input");
-  searchInput.id = "episode-search";
-  searchInput.type = "search";
-  searchInput.placeholder = "Search by name or summary";
+    const searchInput = document.createElement("input");
+    searchInput.id = "episode-search";
+    searchInput.type = "search";
+    searchInput.placeholder = "Search by name or summary";
+    searchInput.classList.add("episode-control");
 
-  const selectLabel = createLabel("episode-select", "Jump to episode");
+    const selectLabel = createLabel("episode-select", "Jump to episode");
+    selectLabel.classList.add("episode-control");
 
-  const episodeSelect = document.createElement("select");
-  episodeSelect.id = "episode-select";
+    const episodeSelect = document.createElement("select");
+    episodeSelect.id = "episode-select";
+    episodeSelect.classList.add("episode-control");
 
   const allEpisodesOption = document.createElement("option");
   allEpisodesOption.value = "all";

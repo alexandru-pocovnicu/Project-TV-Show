@@ -5,6 +5,7 @@ const API_CACHE = new Map();
 let allShows = [];
 
 async function setup() {
+  
   let allEpisodes = [];
   let showChangeRequestId = 0;
   const rootElem = document.getElementById("root");
@@ -38,8 +39,13 @@ async function setup() {
     if (!showId) {
       return;
     }
-
+document
+  .querySelectorAll(".episode-control")
+  .forEach((el) => (el.style.display = "block"));
     if (showId === "all-shows") {
+      document
+        .querySelectorAll(".episode-control")
+        .forEach((el) => (el.style.display = "none"));
       controls.searchInput.value = "";
       controls.episodeSelect.value = "all";
       state.selectedEpisodeCode = "all";
@@ -116,7 +122,7 @@ async function setup() {
     return;
   }
 
-  // Fetch all shows and render the listing
+  
   allShows = await fetchShows();
   renderShowsListing(allShows, rootElem);
   navBar.style.display = "none";
@@ -128,6 +134,9 @@ async function setup() {
     navBar.style.display = "none";
     controls.container.style.display = "";
     controls.showSelect.value = "";
+    document
+      .querySelectorAll(".episode-control")
+      .forEach((el) => (el.style.display = "none"));
   });
 }
 
@@ -299,6 +308,7 @@ function createLabel(forId, text) {
 }
 
 function renderPage(allEpisodes, state, matchCountElem, rootElem) {
+  
   const filteredEpisodes = allEpisodes.filter((episode) => {
     const matchesSearch = episodeMatchesSearch(episode, state.searchTerm);
     const matchesSelect =
@@ -466,13 +476,16 @@ function renderShowsListing(shows, container) {
     container.appendChild(showCard);
   });
 
-  // Add event listener for show search input (if not already added)
+ 
   if (showSearchInput && !showSearchInput._listenerAdded) {
     showSearchInput.addEventListener("input", () => {
       renderShowsListing(shows, container);
     });
     showSearchInput._listenerAdded = true;
   }
+  document
+    .querySelectorAll(".episode-control")
+    .forEach((el) => (el.style.display = "none"));
 }
 
 window.onload = setup;

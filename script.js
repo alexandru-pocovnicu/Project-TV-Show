@@ -39,6 +39,14 @@ async function setup() {
       return;
     }
 
+    if (showId === "back-to-shows") {
+      renderShowsListing(allShows, rootElem);
+      navBar.style.display = "none";
+      controls.container.style.display = "";
+      controls.showSelect.value = "back-to-shows";
+      return;
+    }
+
     const previousShowId = state.selectedShowId;
     const previousEpisodes = allEpisodes;
     const currentRequestId = ++showChangeRequestId;
@@ -100,7 +108,6 @@ async function setup() {
     return;
   }
 
- 
   allShows = await fetchShows();
   renderShowsListing(allShows, rootElem);
   navBar.style.display = "none";

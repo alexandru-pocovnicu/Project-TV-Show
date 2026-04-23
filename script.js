@@ -40,13 +40,21 @@ async function setup() {
     }
 
     if (showId === "all-shows") {
+      controls.searchInput.value = "";
+      controls.episodeSelect.value = "all";
+      state.selectedEpisodeCode = "all";
+      state.searchTerm = "";
+
+      const episodeSearchInput = document.getElementById("episode-search");
+      if (episodeSearchInput) episodeSearchInput.value = "";
+
       renderShowsListing(allShows, rootElem);
       navBar.style.display = "none";
       controls.container.style.display = "";
       controls.showSelect.value = "all-shows";
       return;
     }
-    
+
     const previousShowId = state.selectedShowId;
     const previousEpisodes = allEpisodes;
     const currentRequestId = ++showChangeRequestId;
